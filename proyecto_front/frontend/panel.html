@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Panel Principal - UTPL</title>
+    <title>Panel Empresarial - UTPL</title>
 
     <!-- Bootstrap CSS -->
     <link
@@ -17,25 +17,21 @@
       rel="stylesheet"
     />
 
-    <!-- Google Fonts -->
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
-      rel="stylesheet"
-    />
+
 
     <!-- Custom CSS -->
     <link href="panel-styles.css" rel="stylesheet" />
   </head>
   <body>
     <!-- Header del panel -->
-    <div class="panel-header">
+    <div class="panel-header navbar navbar-expand-lg navbar-light bg-white shadow-sm mb-4">
       <div class="container">
-        <div class="d-flex justify-content-between align-items-center">
-          <h1 class="panel-title">
-            <i class="fas fa-tachometer-alt"></i>
-            Panel de Control
+        <div class="d-flex justify-content-between align-items-center w-100">
+          <h1 class="panel-title h3 mb-0">
+            <i class="fas fa-briefcase me-2"></i>
+            Panel Empresarial
           </h1>
-          <button class="btn btn-logout" id="logoutBtn">
+          <button class="btn btn-logout btn-danger" id="logoutBtn">
             <i class="fas fa-sign-out-alt me-2"></i>
             Cerrar Sesión
           </button>
@@ -49,10 +45,10 @@
       <div id="bienvenida"></div>
 
       <!-- Card de Mis Documentos -->
-      <div class="main-card">
-        <div class="card-header">
-          <h5>
-            <i class="fas fa-file-alt"></i>
+      <div class="main-card card shadow-sm mb-4">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <h5 class="mb-0">
+            <i class="fas fa-file-alt me-2"></i>
             Mis Documentos
           </h5>
           <button
@@ -65,7 +61,7 @@
           </button>
         </div>
         <div class="card-body">
-          <ul class="list-group" id="misDocumentos">
+          <ul class="list-group list-group-flush" id="misDocumentos">
             <li class="list-group-item text-center text-muted">
               <i class="fas fa-spinner fa-spin me-2"></i>
               Cargando documentos...
