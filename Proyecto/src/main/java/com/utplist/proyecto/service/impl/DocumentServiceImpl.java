@@ -3,6 +3,7 @@ package com.utplist.proyecto.service.impl;
 import com.utplist.proyecto.dto.*;
 import com.utplist.proyecto.exception.*;
 import com.utplist.proyecto.model.*;
+import com.utplist.proyecto.observer.InvitacionNotifier;
 import com.utplist.proyecto.repository.*;
 import com.utplist.proyecto.service.IDocumentService;
 import com.utplist.proyecto.service.IFeatureFlagService;
@@ -23,6 +24,7 @@ public class DocumentServiceImpl implements IDocumentService {
     private final SolicitudEdicionRepository solicitudEdicionRepository;
     private final SuscripcionRepository suscripcionRepository;
     private final IFeatureFlagService featureFlagService;
+    private final InvitacionNotifier invitacionNotifier; // Agrega esto en el constructor con @RequiredArgsConstructor
 
     private static final String FLAG_SUSCRIPCIONES = "suscripciones";
     private static final String FLAG_SOLICITUDES_EDICION = "solicitudes_edicion";
@@ -85,7 +87,9 @@ public class DocumentServiceImpl implements IDocumentService {
         }
         inv.setRol(rol);
         inv.setAceptada(false);
+
         invitacionRepository.save(inv);
+        invitacionNotifier.notificarInvitacion(inv);
     }
     @Override
     public void aceptarInvitacion(Long documentoId, String correoInvitado) {
