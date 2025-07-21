@@ -12,6 +12,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "Autenticación", description = "Operaciones de registro, login y validación de usuarios")
@@ -29,6 +30,7 @@ public class AuthController {
         return ResponseEntity.ok("User registered successfully");
     }
 
+    @PreAuthorize("hasRole('SUPERADMINISTRADOR')")
     @Operation(summary = "Registrar un nuevo administrador")
     @PostMapping("/register/admin")
     public ResponseEntity<String> registerAdmin(@Valid @RequestBody RegisterRequestDTO request) {
@@ -40,6 +42,14 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<LoginResponseDTO> login(@Valid @RequestBody LoginRequestDTO request) {
         return ResponseEntity.ok(authService.login(request));
+    }
+
+    @PreAuthorize("hasRole('SUPERADMINISTRADOR')")
+    @Operation(summary = "Registrar un nuevo Moderador")
+    @PostMapping("/register/moderator")
+    public ResponseEntity<String> registerModerador(@Valid @RequestBody RegisterRequestDTO request) {
+        authService.registerModerador(request);
+        return ResponseEntity.ok("Moderator registered successfully");
     }
 
     @Operation(summary = "Validar un token JWT")

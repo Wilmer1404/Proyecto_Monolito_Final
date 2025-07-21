@@ -12,11 +12,7 @@ import java.util.List;
  */
 @Entity
 @Table(name = "documentos")
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
+@Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
 public class Document {
 
     @Id
@@ -28,11 +24,19 @@ public class Document {
     @Size(max = 255)
     private String titulo;
 
-    /** Correo del autor. Obligatorio y válido. */
-    @NotBlank
-    @Email
+    /** Correo del autor (se mantiene por compatibilidad / consultas rápidas). */
+    @NotBlank @Email
     @Column(name = "autor_correo", nullable = false)
     private String autorCorreo;
+
+    /**
+     * Relación con User.
+     *  - FK: autor_id → users.id
+     *  - LAZY para no cargar el usuario en cada consulta.
+     */
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "autor_id", nullable = false)
+    private User autor;
 
     @Column(name = "fecha_creacion")
     private LocalDateTime fechaCreacion;
@@ -41,10 +45,8 @@ public class Document {
     private LocalDateTime fechaActualizacion;
 
     private String contenido;
-
     @Size(max = 100)
     private String categoria;
-
     private Boolean publico;
 
     /** Indica si se puede editar. */
@@ -54,4 +56,4 @@ public class Document {
     /** Invitaciones asociadas. */
     @OneToMany(mappedBy = "documento", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Invitacion> invitados = new ArrayList<>();
-} 
+}

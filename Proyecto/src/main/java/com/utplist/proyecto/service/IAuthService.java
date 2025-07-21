@@ -8,6 +8,7 @@ import java.util.Map;
 public interface IAuthService {
     void register(RegisterRequestDTO request);
     void registerAdmin(RegisterRequestDTO request);
+    void registerModerador(RegisterRequestDTO request);
     LoginResponseDTO login(LoginRequestDTO request);
     Map<String, Object> validateToken(String token);
 } 

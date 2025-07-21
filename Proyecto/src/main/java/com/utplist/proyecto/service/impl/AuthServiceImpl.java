@@ -29,7 +29,7 @@ public class AuthServiceImpl implements IAuthService {
         User user = User.builder()
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
-                .role(Role.USER)
+                .role(Role.USUARIO)
                 .build();
         userRepository.save(user);
     }
@@ -54,10 +54,24 @@ public class AuthServiceImpl implements IAuthService {
         User user = User.builder()
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
-                .role(Role.ADMIN)
+                .role(Role.ADMINISTRADOR)
                 .build();
         userRepository.save(user);
     }
+
+    @Override
+    public void registerModerador(RegisterRequestDTO request) {
+        if (userRepository.existsByEmail(request.getEmail())) {
+            throw new RuntimeException("Email already registered");
+        }
+        User user = User.builder()
+                .email(request.getEmail())
+                .password(passwordEncoder.encode(request.getPassword()))
+                .role(Role.MODERADOR)
+                .build();
+        userRepository.save(user);
+    }
+
     @Override
     public Map<String, Object> validateToken(String token) {
         if (!jwtUtil.isTokenValid(token)) {

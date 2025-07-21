@@ -25,16 +25,31 @@ public class DocumentServiceImpl implements IDocumentService {
     private final SuscripcionRepository suscripcionRepository;
     private final IFeatureFlagService featureFlagService;
     private final InvitacionNotifier invitacionNotifier; // Agrega esto en el constructor con @RequiredArgsConstructor
+    private final UserRepository userRepository;
 
     private static final String FLAG_SUSCRIPCIONES = "suscripciones";
     private static final String FLAG_SOLICITUDES_EDICION = "solicitudes_edicion";
     private static final String FLAG_INVITACIONES = "invitaciones";
 
+    private boolean esAutorONivelSuper(Long userId, String autorCorreo) {
+        User u = userRepository.findById(userId)
+                .orElseThrow();
+        return u.getRole() == Role.SUPERADMINISTRADOR || u.getEmail().equals(autorCorreo);
+    }
+    private boolean esAutor(Long userId, String autorCorreo) {
+        User u = userRepository.findById(userId)
+                .orElseThrow();
+        return u.getEmail().equals(autorCorreo);
+    }
+
     @Override
     public DocumentResponseDTO crearDocumento(CreateDocumentDTO dto, String correo) {
+        User autor = userRepository.findByEmail(correo)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
         Document doc = Document.builder()
                 .titulo(dto.getTitulo())
                 .autorCorreo(correo)
+                .autor(autor)
                 .fechaCreacion(LocalDateTime.now())
                 .fechaActualizacion(LocalDateTime.now())
                 .contenido("")
@@ -55,9 +70,10 @@ public class DocumentServiceImpl implements IDocumentService {
         return toDTO(doc);
     }
     @Override
-    public void eliminarDocumento(Long id) {
-        if (!repository.existsById(id)) {
-            throw new DocumentoNoEncontradoException(id);
+    public void eliminarDocumento(Long userId, Long id) {
+        Document doc = repository.findById(id).orElseThrow(() -> new DocumentoNoEncontradoException(id));
+        if (!esAutorONivelSuper(userId, doc.getAutorCorreo())) {
+            throw new PermisoDenegadoException("No tienes permiso para eliminar este documento");
         }
         repository.deleteById(id);
     }
@@ -113,13 +129,11 @@ public class DocumentServiceImpl implements IDocumentService {
         invitacionRepository.save(inv);
     }
     @Override
-    public void editarDocumento(Long id, String correoInvitado, EditarDocumentoDTO dto) {
-        Invitacion inv = invitacionRepository.findByDocumentoIdAndCorreoInvitado(id, correoInvitado)
-                .orElseThrow(() -> new PermisoDenegadoException("No tienes permiso para editar"));
-        if (!Boolean.TRUE.equals(inv.getAceptada()) || inv.getRol() != RollInvitado.EDITOR) {
-            throw new PermisoDenegadoException("Requiere rol EDITOR y haber aceptado");
-        }
+    public void editarDocumento(Long userId, Long id, EditarDocumentoDTO dto) {
         Document doc = repository.findById(id).orElseThrow(() -> new DocumentoNoEncontradoException(id));
+        if (!esAutor(userId, doc.getAutorCorreo())) {
+            throw new PermisoDenegadoException("Solo el autor puede editar este documento");
+        }
         Optional.ofNullable(dto.getTitulo()).ifPresent(doc::setTitulo);
         Optional.ofNullable(dto.getContenido()).ifPresent(doc::setContenido);
         Optional.ofNullable(dto.getCategoria()).ifPresent(doc::setCategoria);
@@ -235,4 +249,4 @@ public class DocumentServiceImpl implements IDocumentService {
                 .estado(sol.getEstado())
                 .build();
     }
-} 
+}

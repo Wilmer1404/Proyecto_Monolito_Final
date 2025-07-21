@@ -73,8 +73,12 @@ public class DocumentController {
 
     @Operation(summary = "Eliminar documento")
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> eliminar(@Parameter(description = "ID del documento", required = true) @PathVariable Long id) {
-        documentService.eliminarDocumento(id);
+    public ResponseEntity<Void> eliminar(
+            @Parameter(description = "ID del documento", required = true) @PathVariable Long id,
+            @Parameter(description = "ID del usuario (header X-User-Id)", required = true)
+            @RequestHeader("X-User-Id") Long userId
+    ) {
+        documentService.eliminarDocumento(userId, id);
         return ResponseEntity.noContent().build();
     }
 
@@ -130,10 +134,10 @@ public class DocumentController {
     public ResponseEntity<Void> editar(
             @Parameter(description = "ID del documento", required = true) @PathVariable Long id,
             @Valid @RequestBody EditarDocumentoDTO dto,
-            @Parameter(description = "Correo del invitado (header X-Correo-Invitado)", required = true)
-            @RequestHeader("X-Correo-Invitado") String correoInvitado
+            @Parameter(description = "ID del usuario (header X-User-Id)", required = true)
+            @RequestHeader("X-User-Id") Long userId
     ) {
-        documentService.editarDocumento(id, correoInvitado, dto);
+        documentService.editarDocumento(userId, id, dto);
         return ResponseEntity.ok().build();
     }
 
