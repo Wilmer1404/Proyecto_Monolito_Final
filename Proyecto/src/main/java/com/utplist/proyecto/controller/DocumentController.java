@@ -59,7 +59,7 @@ public class DocumentController {
             @Parameter(description = "Filtro por autor") @RequestParam(required = false) String autor,
             @Parameter(hidden = true)
             @PageableDefault(sort = "fechaCreacion", direction = Sort.Direction.DESC) Pageable pageable
-    ) {
+    ) { 
         return ResponseEntity.ok(
                 documentService.buscar(titulo, categoria, autor, pageable)
         );
