@@ -30,6 +30,7 @@ public class DocumentServiceImpl implements IDocumentService {
     private static final String FLAG_SUSCRIPCIONES = "suscripciones";
     private static final String FLAG_SOLICITUDES_EDICION = "solicitudes_edicion";
     private static final String FLAG_INVITACIONES = "invitaciones";
+    private String hola;
 
     private boolean esAutorONivelSuper(Long userId, String autorCorreo) {
         User u = userRepository.findById(userId)
@@ -59,7 +60,11 @@ public class DocumentServiceImpl implements IDocumentService {
                 .build();
         Document saved = repository.save(doc);
         return toDTO(saved);
+            
+
+
     }
+    //hola
     @Override
     public Page<DocumentResponseDTO> obtenerDocumentosPorAutor(String correo, Pageable pageable) {
         return repository.findByAutorCorreo(correo, pageable).map(this::toDTO);
