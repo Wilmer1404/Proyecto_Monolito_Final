@@ -1,4 +1,5 @@
 // Configuración de la API
+// Cambia esta URL si tu backend está en otro host o puerto
 const API_URL = "http://localhost:8080/auth";
 
 // Clase para manejar la autenticación
@@ -64,7 +65,12 @@ class AuthManager {
                     
                     // Redirigir después de un breve delay
                     setTimeout(() => {
-                        window.location.href = "panel.html";
+                        const role = data.role;
+                        if (role === 'ADMINISTRADOR' || role === 'SUPERADMINISTRADOR') {
+                            window.location.href = "dashboard.html";
+                        } else {
+                            window.location.href = "panel.html";
+                        }
                     }, 1500);
                 } else {
                     const error = await response.text();
@@ -169,6 +175,9 @@ class AuthManager {
         localStorage.setItem("jwt", data.token);
         localStorage.setItem("role", data.role);
         localStorage.setItem("email", email);
+        if (data.id) {
+            localStorage.setItem("userId", data.id);
+        }
     }
 
     // Mostrar mensaje de éxito

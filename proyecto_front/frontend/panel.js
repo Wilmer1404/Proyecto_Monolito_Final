@@ -144,84 +144,70 @@ class PanelManager {
     }
   }
 
-  // Cargar documentos propios
-  async cargarMisDocumentos() {
+  // Cargar documentos propios con paginación
+  async cargarMisDocumentos(page = 0) {
     try {
       const response = await fetch(
-        `${API_URL}/documentos?correo=${encodeURIComponent(this.email)}`,
+        `${API_URL}/documentos?correo=${encodeURIComponent(this.email)}&page=${page}&size=5&sort=fechaCreacion,desc`,
         {
           headers: {
             Authorization: "Bearer " + this.jwt,
           },
         }
       );
-
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-
       const data = await response.json();
       const ul = document.getElementById("misDocumentos");
-
       if (ul) {
         ul.innerHTML = "";
         const documentos = data.content || [];
-
         if (documentos.length === 0) {
           ul.innerHTML = `
-                        <li class="list-group-item text-center text-muted">
-                            <i class="fas fa-file-alt me-2"></i>
-                            No tienes documentos creados
-                        </li>
-                    `;
+            <li class="list-group-item text-center text-muted">
+              <i class="fas fa-file-alt me-2"></i>
+              No tienes documentos creados
+            </li>
+          `;
         } else {
           documentos.forEach((doc) => {
             const fecha = doc.fechaCreacion
               ? new Date(doc.fechaCreacion).toLocaleDateString("es-ES")
               : "";
             ul.innerHTML += `
-                            <li class="list-group-item d-flex justify-content-between align-items-center">
-                                <div>
-                                    <i class="fas fa-file-alt me-2 text-primary"></i>
-                                    <span class="fw-bold">${doc.titulo}</span>
-                                    ${
-                                      doc.publico
-                                        ? '<span class="badge bg-success ms-2">Público</span>'
-                                        : '<span class="badge bg-secondary ms-2">Privado</span>'
-                                    }
-                                </div>
-                                <div class="d-flex align-items-center gap-2">
-                                    <span class="text-muted small">
-                                        <i class="fas fa-calendar me-1"></i>
-                                        ${fecha}
-                                    </span>
-                                    <div class="btn-group btn-group-sm">
-                                        <button class="btn btn-outline-primary btn-sm" onclick="panelManager.verDocumento(${
-                                          doc.id
-                                        })" title="Ver documento">
-                                            <i class="fas fa-eye"></i>
-                                        </button>
-                                        <button class="btn btn-outline-success btn-sm" onclick="panelManager.invitarUsuario(${
-                                          doc.id
-                                        })" title="Invitar usuario">
-                                            <i class="fas fa-user-plus"></i>
-                                        </button>
-                                        <button class="btn btn-outline-warning btn-sm" onclick="panelManager.editarDocumento(${
-                                          doc.id
-                                        })" title="Editar">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
-                                        <button class="btn btn-outline-danger btn-sm" onclick="panelManager.eliminarDocumento(${
-                                          doc.id
-                                        })" title="Eliminar">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                            </li>
-                        `;
+              <li class="list-group-item d-flex justify-content-between align-items-center">
+                <div>
+                  <i class="fas fa-file-alt me-2 text-primary"></i>
+                  <span class="fw-bold">${doc.titulo}</span>
+                  ${doc.publico ? '<span class="badge bg-success ms-2">Público</span>' : '<span class="badge bg-secondary ms-2">Privado</span>'}
+                  ${doc.rutaArchivo ? `<a href=\"${API_URL}/documentos/${doc.id}/archivo\" class=\"ms-2 btn btn-sm btn-outline-secondary\" target=\"_blank\"><i class=\"fas fa-download\"></i> Descargar archivo</a>` : ''}
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                  <span class="text-muted small">
+                    <i class="fas fa-calendar me-1"></i>
+                    ${fecha}
+                  </span>
+                  <div class="btn-group btn-group-sm">
+                    <button class="btn btn-outline-primary btn-sm" onclick="panelManager.verDocumento(${doc.id})" title="Ver documento">
+                      <i class="fas fa-eye"></i>
+                    </button>
+                    <button class="btn btn-outline-success btn-sm" onclick="panelManager.invitarUsuario(${doc.id})" title="Invitar usuario">
+                      <i class="fas fa-user-plus"></i>
+                    </button>
+                    <button class="btn btn-outline-warning btn-sm" onclick="panelManager.editarDocumento(${doc.id})" title="Editar">
+                      <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="btn btn-outline-danger btn-sm" onclick="panelManager.eliminarDocumento(${doc.id})" title="Eliminar">
+                      <i class="fas fa-trash"></i>
+                    </button>
+                  </div>
+                </div>
+              </li>
+            `;
           });
         }
+        this.mostrarPaginacion('paginacion-misDocumentos', data.totalPages, page, 'cargarMisDocumentos');
       }
     } catch (error) {
       console.error("Error cargando mis documentos:", error);
@@ -229,66 +215,73 @@ class PanelManager {
     }
   }
 
-  // Cargar documentos compartidos
-  async cargarCompartidos() {
+  // Cargar documentos compartidos con paginación
+  async cargarCompartidos(page = 0) {
     try {
       const response = await fetch(
-        `${API_URL}/documentos/compartidos?correoInvitado=${encodeURIComponent(
-          this.email
-        )}`,
+        `${API_URL}/documentos/compartidos?correoInvitado=${encodeURIComponent(this.email)}&page=${page}&size=5&sort=fechaCreacion,desc`,
         {
           headers: {
             Authorization: "Bearer " + this.jwt,
           },
         }
       );
-
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-
       const data = await response.json();
       const ul = document.getElementById("compartidos");
-
       if (ul) {
         ul.innerHTML = "";
         const documentos = data.content || [];
-
         if (documentos.length === 0) {
           ul.innerHTML = `
-                        <li class="list-group-item text-center text-muted">
-                            <i class="fas fa-share-alt me-2"></i>
-                            No tienes documentos compartidos
-                        </li>
-                    `;
+            <li class="list-group-item text-center text-muted">
+              <i class="fas fa-share-alt me-2"></i>
+              No tienes documentos compartidos
+            </li>
+          `;
         } else {
           documentos.forEach((doc) => {
             const fecha = doc.fechaCreacion
               ? new Date(doc.fechaCreacion).toLocaleDateString("es-ES")
               : "";
+            let botones = `
+              <button class="btn btn-outline-primary btn-sm" onclick="panelManager.verDocumento(${doc.id})" title="Ver documento">
+                <i class="fas fa-eye"></i>
+              </button>
+            `;
+
+            // Si el usuario es EDITOR, muestra el botón de editar
+            if (doc.rolInvitacion === "EDITOR") {
+              botones += `
+                <button class="btn btn-outline-success btn-sm ms-2" onclick="panelManager.editarDocumento(${doc.id})" title="Editar">
+                  <i class="fas fa-edit"></i>
+                </button>
+              `;
+            }
             ul.innerHTML += `
-                            <li class="list-group-item">
-                                <div class="d-flex justify-content-between align-items-start">
-                                    <div>
-                                        <i class="fas fa-share-alt me-2 text-success"></i>
-                                        <span class="fw-bold">${doc.titulo}</span>
-                                        <span class="text-muted small d-block">
-                                            <i class="fas fa-user me-1"></i>
-                                            Autor: ${doc.autorCorreo}
-                                        </span>
-                                        <span class="text-muted small">
-                                            <i class="fas fa-calendar me-1"></i>
-                                            ${fecha}
-                                        </span>
-                                    </div>
-                                    <button class="btn btn-outline-primary btn-sm" onclick="panelManager.verDocumento(${doc.id})" title="Ver documento">
-                                        <i class="fas fa-eye"></i>
-                                    </button>
-                                </div>
-                            </li>
-                        `;
+              <li class="list-group-item">
+                <div class="d-flex justify-content-between align-items-start">
+                  <div>
+                    <i class="fas fa-share-alt me-2 text-success"></i>
+                    <span class="fw-bold">${doc.titulo}</span>
+                    <span class="text-muted small d-block">
+                      <i class="fas fa-user me-1"></i>
+                      Autor: ${doc.autorCorreo}
+                    </span>
+                    <span class="text-muted small">
+                      <i class="fas fa-calendar me-1"></i>
+                      ${fecha}
+                    </span>
+                  </div>
+                  ${botones}
+                </div>
+              </li>
+            `;
           });
         }
+        this.mostrarPaginacion('paginacion-compartidos', data.totalPages, page, 'cargarCompartidos');
       }
     } catch (error) {
       console.error("Error cargando documentos compartidos:", error);
@@ -296,68 +289,49 @@ class PanelManager {
     }
   }
 
-  // Cargar invitaciones
-  async cargarInvitaciones() {
+  // Cargar invitaciones aceptadas con paginación
+  async cargarInvitaciones(page = 0) {
     try {
       const response = await fetch(
-        `${API_URL}/documentos/invitaciones?correo=${encodeURIComponent(
-          this.email
-        )}`,
+        `${API_URL}/documentos/invitaciones?correo=${encodeURIComponent(this.email)}&page=${page}&size=5&sort=id,desc`,
         {
           headers: {
             Authorization: "Bearer " + this.jwt,
           },
         }
       );
-
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-
       const data = await response.json();
       const ul = document.getElementById("invitaciones");
-
       if (ul) {
         ul.innerHTML = "";
-        const invitaciones = data || [];
-
+        const invitaciones = data.content || [];
         if (invitaciones.length === 0) {
           ul.innerHTML = `
-                        <li class="list-group-item text-center text-muted">
-                            <i class="fas fa-envelope me-2"></i>
-                            No tienes invitaciones
-                        </li>
-                    `;
+            <li class="list-group-item text-center text-muted">
+              <i class="fas fa-envelope me-2"></i>
+              No tienes invitaciones
+            </li>
+          `;
         } else {
           invitaciones.forEach((inv) => {
             ul.innerHTML += `
-                            <li class="list-group-item">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div>
-                                        <i class="fas fa-envelope me-2 text-warning"></i>
-                                        <span class="fw-bold">${
-                                          inv.rol
-                                        }</span> - ${inv.correoInvitado}
-                                        ${
-                                          inv.aceptada
-                                            ? '<span class="badge bg-success ms-2">Aceptada</span>'
-                                            : '<span class="badge bg-warning ms-2">Pendiente</span>'
-                                        }
-                                    </div>
-                                    ${
-                                      !inv.aceptada
-                                        ? `
-                                        <button class="btn btn-success btn-sm" onclick="panelManager.aceptarInvitacion(${inv.documentoId}, '${inv.correoInvitado}')" title="Aceptar invitación">
-                                            <i class="fas fa-check"></i>
-                                        </button>
-                                    `
-                                        : ""
-                                    }
-                                </div>
-                            </li>
-                        `;
+              <li class="list-group-item">
+                <div class="d-flex justify-content-between align-items-center">
+                  <div>
+                    <i class="fas fa-envelope me-2 ${inv.aceptada ? 'text-success' : 'text-warning'}"></i>
+                    <span class="fw-bold">${inv.rol}</span> - ${inv.correoInvitado}
+                    ${inv.aceptada ? '<span class="badge bg-success ms-2">Aceptada</span>' : '<span class="badge bg-warning ms-2">Pendiente</span>'}
+                  </div>
+                  ${!inv.aceptada ? `<button class="btn btn-success btn-sm" onclick="panelManager.aceptarInvitacion(${inv.documentoId}, '${inv.correoInvitado}')" title="Aceptar invitación"><i class="fas fa-check"></i></button>` : ""}
+                </div>
+              </li>
+            `;
           });
         }
+        this.mostrarPaginacion('paginacion-invitaciones', data.totalPages, page, 'cargarInvitaciones');
       }
     } catch (error) {
       console.error("Error cargando invitaciones:", error);
@@ -365,70 +339,59 @@ class PanelManager {
     }
   }
 
-  // Cargar suscripciones
-  async cargarSuscripciones() {
+  // Cargar suscripciones con paginación
+  async cargarSuscripciones(page = 0) {
     try {
       const response = await fetch(
-        `${API_URL}/documentos/suscripciones?correo=${encodeURIComponent(
-          this.email
-        )}`,
+        `${API_URL}/documentos/suscripciones?correo=${encodeURIComponent(this.email)}&page=${page}&size=5&sort=id,desc`,
         {
           headers: {
             Authorization: "Bearer " + this.jwt,
           },
         }
       );
-
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-
       const data = await response.json();
       const ul = document.getElementById("suscripciones");
-
       if (ul) {
         ul.innerHTML = "";
-        const suscripciones = data || [];
-
+        const suscripciones = data.content || [];
         if (suscripciones.length === 0) {
           ul.innerHTML = `
-                        <li class="list-group-item text-center text-muted">
-                            <i class="fas fa-bell me-2"></i>
-                            No tienes suscripciones
-                        </li>
-                    `;
+            <li class="list-group-item text-center text-muted">
+              <i class="fas fa-bell me-2"></i>
+              No tienes suscripciones
+            </li>
+          `;
         } else {
           suscripciones.forEach((sub) => {
             ul.innerHTML += `
-                            <li class="list-group-item">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div>
-                                        <i class="fas fa-bell me-2 text-info"></i>
-                                        <span class="fw-bold">${
-                                          sub.titulo
-                                        }</span>
-                                        <span class="text-muted small d-block">
-                                            <i class="fas fa-tag me-1"></i>
-                                            ${sub.categoria || "Sin categoría"}
-                                        </span>
-                                    </div>
-                                    <div class="btn-group btn-group-sm">
-                                        <button class="btn btn-outline-primary btn-sm" onclick="panelManager.verDocumento(${
-                                          sub.documentoId
-                                        })" title="Ver documento">
-                                            <i class="fas fa-eye"></i>
-                                        </button>
-                                        <button class="btn btn-outline-danger btn-sm" onclick="panelManager.cancelarSuscripcion(${
-                                          sub.documentoId
-                                        })" title="Cancelar suscripción">
-                                            <i class="fas fa-times"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                            </li>
-                        `;
+              <li class="list-group-item">
+                <div class="d-flex justify-content-between align-items-center">
+                  <div>
+                    <i class="fas fa-bell me-2 text-info"></i>
+                    <span class="fw-bold">${sub.titulo}</span>
+                    <span class="text-muted small d-block">
+                      <i class="fas fa-tag me-1"></i>
+                      ${sub.categoria || "Sin categoría"}
+                    </span>
+                  </div>
+                  <div class="btn-group btn-group-sm">
+                    <button class="btn btn-outline-primary btn-sm" onclick="panelManager.verDocumento(${sub.documentoId})" title="Ver documento">
+                      <i class="fas fa-eye"></i>
+                    </button>
+                    <button class="btn btn-outline-danger btn-sm" onclick="panelManager.cancelarSuscripcion(${sub.documentoId})" title="Cancelar suscripción">
+                      <i class="fas fa-times"></i>
+                    </button>
+                  </div>
+                </div>
+              </li>
+            `;
           });
         }
+        this.mostrarPaginacion('paginacion-suscripciones', data.totalPages, page, 'cargarSuscripciones');
       }
     } catch (error) {
       console.error("Error cargando suscripciones:", error);
@@ -440,15 +403,10 @@ class PanelManager {
   async handleSearch(e) {
     e.preventDefault();
     const titulo = document.getElementById("buscaTitulo").value;
-    const categoria = document.getElementById("buscaCategoria").value;
-    const autor = document.getElementById("buscaAutor").value;
-
+    // Solo buscar por título
     try {
       const params = new URLSearchParams();
       if (titulo) params.append("titulo", titulo);
-      if (categoria) params.append("categoria", categoria);
-      if (autor) params.append("autor", autor);
-
       const response = await fetch(
         `${API_URL}/documentos/buscar?${params.toString()}`,
         {
@@ -457,66 +415,50 @@ class PanelManager {
           },
         }
       );
-
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-
       const data = await response.json();
       const ul = document.getElementById("busquedaResultados");
-
       if (ul) {
         ul.innerHTML = "";
-        const resultados = data.content || [];
-
-        if (resultados.length === 0) {
+        const documentos = data.content || [];
+        if (documentos.length === 0) {
           ul.innerHTML = `
-                        <li class="list-group-item text-center text-muted">
-                            <i class="fas fa-search me-2"></i>
-                            No se encontraron resultados
-                        </li>
-                    `;
+            <li class="list-group-item text-center text-muted">
+              <i class="fas fa-info-circle me-2"></i>
+              No se encontraron documentos
+            </li>
+          `;
         } else {
-          resultados.forEach((doc) => {
+          documentos.forEach((doc) => {
             const fecha = doc.fechaCreacion
               ? new Date(doc.fechaCreacion).toLocaleDateString("es-ES")
               : "";
             ul.innerHTML += `
-                            <li class="list-group-item">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div>
-                                        <i class="fas fa-file-alt me-2 text-primary"></i>
-                                        <span class="fw-bold">${
-                                          doc.titulo
-                                        }</span>
-                                        <span class="text-muted small d-block">
-                                            <i class="fas fa-user me-1"></i>
-                                            Autor: ${doc.autorCorreo}
-                                        </span>
-                                        <span class="text-muted small">
-                                            <i class="fas fa-calendar me-1"></i>
-                                            ${fecha}
-                                        </span>
-                                    </div>
-                                    <div class="btn-group btn-group-sm">
-                                        <button class="btn btn-outline-primary btn-sm" onclick="panelManager.verDocumento(${
-                                          doc.id
-                                        })" title="Ver documento">
-                                            <i class="fas fa-eye"></i>
-                                        </button>
-                                        ${
-                                          doc.publico
-                                            ? `
-                                            <button class="btn btn-outline-success btn-sm" onclick="panelManager.suscribirseDocumento(${doc.id})" title="Suscribirse">
-                                                <i class="fas fa-bell"></i>
-                                            </button>
-                                        `
-                                            : ""
-                                        }
-                                    </div>
-                                </div>
-                            </li>
-                        `;
+              <li class="list-group-item">
+                <div class="d-flex justify-content-between align-items-center">
+                  <div>
+                    <i class="fas fa-file-alt me-2 text-primary"></i>
+                    <span class="fw-bold">${doc.titulo}</span>
+                    <span class="text-muted small d-block">
+                      <i class="fas fa-user me-1"></i>
+                      Autor: ${doc.autorCorreo}
+                    </span>
+                    <span class="text-muted small">
+                      <i class="fas fa-calendar me-1"></i>
+                      ${fecha}
+                    </span>
+                  </div>
+                  <div class="btn-group btn-group-sm">
+                    <button class="btn btn-outline-primary btn-sm" onclick="panelManager.verDocumento(${doc.id})" title="Ver documento">
+                      <i class="fas fa-eye"></i>
+                    </button>
+                    ${doc.publico ? `<button class="btn btn-outline-success btn-sm" onclick="panelManager.suscribirseDocumento(${doc.id})" title="Suscribirse"><i class="fas fa-bell"></i></button>` : ""}
+                  </div>
+                </div>
+              </li>
+            `;
           });
         }
       }
@@ -538,37 +480,36 @@ class PanelManager {
 
     const titulo = document.getElementById("docTitulo").value;
     const publico = document.getElementById("docPublico").value === "true";
+    const archivoInput = document.getElementById("docArchivo");
+    const archivo = archivoInput && archivoInput.files.length > 0 ? archivoInput.files[0] : null;
     const submitBtn = form.querySelector('button[type="submit"]');
 
     // Mostrar estado de carga
     this.setLoadingState(submitBtn, true);
 
     try {
+      const formData = new FormData();
+      formData.append("titulo", titulo);
+      formData.append("publico", publico);
+      if (archivo) {
+        formData.append("archivo", archivo);
+      }
       const response = await fetch(`${API_URL}/documentos`, {
         method: "POST",
         headers: {
-          "Content-Type": "application/json",
           Authorization: "Bearer " + this.jwt,
           "X-Autor-Correo": this.email,
         },
-        body: JSON.stringify({ titulo, publico }),
+        body: formData,
       });
 
       if (response.ok) {
-        // Cerrar modal
-        const modal = bootstrap.Modal.getInstance(
-          document.getElementById("crearDocModal")
-        );
-        if (modal) modal.hide();
-
-        // Resetear formulario
-        form.reset();
-        form.classList.remove("was-validated");
-
-        // Recargar documentos
-        await this.cargarMisDocumentos();
-
         this.showToast("Documento creado exitosamente", "success");
+        // Refrescar la lista de documentos
+        await this.cargarMisDocumentos();
+        // Cerrar el modal si existe
+        const modal = bootstrap.Modal.getInstance(document.getElementById("crearDocModal"));
+        if (modal) modal.hide();
       } else {
         const error = await response.text();
         this.showToast(error || "Error al crear el documento", "danger");
@@ -593,8 +534,25 @@ class PanelManager {
       });
       if (response.ok) {
         const doc = await response.json();
-        this.showToast(`Viendo documento: ${doc.titulo}`, "info");
-        // Aquí podrías abrir un modal o redirigir a una página de edición
+        if (doc.rutaArchivo) {
+          // Descargar el archivo usando fetch con JWT y abrirlo en una nueva pestaña
+          const archivoResp = await fetch(`${API_URL}/documentos/${doc.id}/archivo`, {
+            headers: {
+              Authorization: "Bearer " + this.jwt,
+            },
+          });
+          if (archivoResp.ok) {
+            const blob = await archivoResp.blob();
+            const url = window.URL.createObjectURL(blob);
+            window.open(url, '_blank');
+            // Liberar el objeto URL después de un tiempo
+            setTimeout(() => window.URL.revokeObjectURL(url), 10000);
+          } else {
+            this.showToast("No tienes permiso para ver el archivo o no existe.", "danger");
+          }
+        } else {
+          this.showToast(`No hay archivo adjunto para este documento`, "info");
+        }
       } else {
         this.showToast("Error al cargar el documento", "danger");
       }
@@ -607,21 +565,85 @@ class PanelManager {
   // Editar documento
   async editarDocumento(id) {
     try {
+      // Obtener datos del documento
       const response = await fetch(`${API_URL}/documentos/${id}`, {
         headers: {
           Authorization: "Bearer " + this.jwt,
         },
       });
-      if (response.ok) {
-        const doc = await response.json();
-        this.showToast(`Editando documento: ${doc.titulo}`, "info");
-        // Aquí podrías abrir un modal de edición
-      } else {
+      if (!response.ok) {
         this.showToast("Error al cargar el documento", "danger");
+        return;
       }
+      const doc = await response.json();
+      // Obtener rol del usuario sobre el documento
+      let rol = "AUTOR";
+      if (doc.autorCorreo !== this.email) {
+        // Buscar invitación aceptada en la lista de invitaciones
+        const invitacionesResp = await fetch(`${API_URL}/documentos/${id}/invitaciones`, {
+          headers: { Authorization: "Bearer " + this.jwt },
+        });
+        if (invitacionesResp.ok) {
+          const invitaciones = await invitacionesResp.json();
+          const miInv = invitaciones.find(i => i.correoInvitado === this.email && i.aceptada);
+          if (miInv) rol = miInv.rol;
+        }
+      }
+      // Rellenar campos del modal
+      document.getElementById("editDocTitulo").value = doc.titulo;
+      document.getElementById("editDocPublico").value = doc.publico ? "true" : "false";
+      document.getElementById("editDocArchivo").value = "";
+      // Controlar permisos
+      const disabled = (rol === "LECTOR");
+      document.getElementById("editDocTitulo").disabled = disabled;
+      document.getElementById("editDocPublico").disabled = disabled;
+      document.getElementById("editDocArchivo").disabled = disabled;
+      document.getElementById("editarDocGuardarBtn").disabled = disabled;
+      // Mostrar modal
+      const modal = new bootstrap.Modal(document.getElementById("editarDocModal"));
+      modal.show();
+      // Manejar envío del formulario
+      const form = document.getElementById("editarDocForm");
+      form.onsubmit = async (e) => {
+        e.preventDefault();
+        if (disabled) return;
+        if (!form.checkValidity()) {
+          form.classList.add("was-validated");
+          return;
+        }
+        const titulo = document.getElementById("editDocTitulo").value;
+        const publico = document.getElementById("editDocPublico").value;
+        const archivoInput = document.getElementById("editDocArchivo");
+        const archivo = archivoInput && archivoInput.files.length > 0 ? archivoInput.files[0] : null;
+        const formData = new FormData();
+        formData.append("titulo", titulo);
+        formData.append("publico", publico);
+        if (archivo) formData.append("archivo", archivo);
+        // Enviar PATCH multipart
+        try {
+          const patchResp = await fetch(`${API_URL}/documentos/${id}`, {
+            method: "PATCH",
+            headers: {
+              Authorization: "Bearer " + this.jwt,
+              "X-Autor-Correo": this.email,
+            },
+            body: formData,
+          });
+          if (patchResp.ok) {
+            this.showToast("Documento editado exitosamente", "success");
+            modal.hide();
+            await this.cargarMisDocumentos();
+            await this.cargarCompartidos();
+          } else {
+            this.showToast("Error al editar el documento", "danger");
+          }
+        } catch (err) {
+          this.showToast("Error al editar el documento", "danger");
+        }
+      };
     } catch (error) {
       console.error("Error editando documento:", error);
-      this.showToast("Error al cargar el documento", "danger");
+      this.showToast("Error al editar el documento", "danger");
     }
   }
 
@@ -632,10 +654,12 @@ class PanelManager {
     }
 
     try {
+      const userId = localStorage.getItem("userId");
       const response = await fetch(`${API_URL}/documentos/${id}`, {
         method: "DELETE",
         headers: {
           Authorization: "Bearer " + this.jwt,
+          "X-User-Id": userId,
         },
       });
 
@@ -669,7 +693,7 @@ class PanelManager {
       if (response.ok) {
         this.showToast("Invitación aceptada exitosamente", "success");
         await this.cargarInvitaciones();
-        await this.cargarCompartidos();
+        await this.cargarCompartidos(); // Refrescar documentos compartidos
       } else {
         this.showToast("Error al aceptar la invitación", "danger");
       }
@@ -786,6 +810,21 @@ class PanelManager {
   logout() {
     localStorage.clear();
     window.location.href = "index.html";
+  }
+
+  // Mostrar controles de paginación reutilizable
+  mostrarPaginacion(containerId, totalPages, currentPage, funcName) {
+    const paginacion = document.getElementById(containerId);
+    if (!paginacion) return;
+    paginacion.innerHTML = "";
+    if (totalPages <= 1) return;
+    if (currentPage > 0) {
+      paginacion.innerHTML += `<button class="btn btn-secondary btn-sm me-2" onclick="panelManager.${funcName}(${currentPage - 1})">Anterior</button>`;
+    }
+    paginacion.innerHTML += `<span>Página ${currentPage + 1} de ${totalPages}</span>`;
+    if (currentPage < totalPages - 1) {
+      paginacion.innerHTML += `<button class="btn btn-secondary btn-sm ms-2" onclick="panelManager.${funcName}(${currentPage + 1})">Siguiente</button>`;
+    }
   }
 }
 

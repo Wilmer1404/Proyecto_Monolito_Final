@@ -13,10 +13,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import java.util.Map;
 
-/**
- * Implementación del servicio de autenticación y gestión de usuarios.
- * Permite registrar usuarios, administradores, moderadores, iniciar sesión y validar tokens JWT.
- */
 @Service
 @RequiredArgsConstructor
 public class AuthServiceImpl implements IAuthService {
@@ -25,10 +21,6 @@ public class AuthServiceImpl implements IAuthService {
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
 
-    /**
-     * Registra un nuevo usuario con rol USUARIO.
-     * @param request Datos del usuario
-     */
     @Override
     public void register(RegisterRequestDTO request) {
         if (userRepository.existsByEmail(request.getEmail())) {
@@ -41,11 +33,6 @@ public class AuthServiceImpl implements IAuthService {
                 .build();
         userRepository.save(user);
     }
-    /**
-     * Inicia sesión y retorna un JWT si las credenciales son válidas.
-     * @param request Datos de inicio de sesión
-     * @return DTO con el token y rol
-     */
     @Override
     public LoginResponseDTO login(LoginRequestDTO request) {
         authenticationManager.authenticate(
@@ -57,12 +44,8 @@ public class AuthServiceImpl implements IAuthService {
         User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new RuntimeException("User not found"));
         String token = jwtUtil.generateToken(user);
-        return new LoginResponseDTO(token, user.getRole().name());
+        return new LoginResponseDTO(user.getId(), token, user.getRole().name());
     }
-    /**
-     * Registra un nuevo administrador con rol ADMINISTRADOR.
-     * @param request Datos del administrador
-     */
     @Override
     public void registerAdmin(RegisterRequestDTO request) {
         if (userRepository.existsByEmail(request.getEmail())) {
@@ -76,10 +59,6 @@ public class AuthServiceImpl implements IAuthService {
         userRepository.save(user);
     }
 
-    /**
-     * Registra un nuevo moderador con rol MODERADOR.
-     * @param request Datos del moderador
-     */
     @Override
     public void registerModerador(RegisterRequestDTO request) {
         if (userRepository.existsByEmail(request.getEmail())) {
@@ -93,11 +72,6 @@ public class AuthServiceImpl implements IAuthService {
         userRepository.save(user);
     }
 
-    /**
-     * Valida un token JWT y retorna información del usuario si es válido.
-     * @param token Token JWT
-     * @return Mapa con información del usuario
-     */
     @Override
     public Map<String, Object> validateToken(String token) {
         if (!jwtUtil.isTokenValid(token)) {

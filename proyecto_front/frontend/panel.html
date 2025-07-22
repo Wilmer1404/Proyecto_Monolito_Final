@@ -71,6 +71,7 @@
               Cargando documentos...
             </li>
           </ul>
+          <div id="paginacion-misDocumentos" class="mt-2"></div>
         </div>
       </div>
 
@@ -93,6 +94,7 @@
                   Cargando...
                 </li>
               </ul>
+              <div id="paginacion-compartidos" class="mt-2"></div>
             </div>
           </div>
 
@@ -111,6 +113,7 @@
                   Cargando...
                 </li>
               </ul>
+              <div id="paginacion-invitaciones" class="mt-2"></div>
             </div>
           </div>
         </div>
@@ -132,6 +135,7 @@
                   Cargando...
                 </li>
               </ul>
+              <div id="paginacion-suscripciones" class="mt-2"></div>
             </div>
           </div>
 
@@ -145,7 +149,7 @@
             </div>
             <div class="card-body">
               <form id="buscadorForm" class="row g-3 mb-3">
-                <div class="col-md-4">
+                <div class="col-md-12">
                   <div class="input-group">
                     <span class="input-group-text">
                       <i class="fas fa-file-alt"></i>
@@ -155,32 +159,6 @@
                       class="form-control"
                       id="buscaTitulo"
                       placeholder="Título"
-                    />
-                  </div>
-                </div>
-                <div class="col-md-4">
-                  <div class="input-group">
-                    <span class="input-group-text">
-                      <i class="fas fa-tag"></i>
-                    </span>
-                    <input
-                      type="text"
-                      class="form-control"
-                      id="buscaCategoria"
-                      placeholder="Categoría"
-                    />
-                  </div>
-                </div>
-                <div class="col-md-4">
-                  <div class="input-group">
-                    <span class="input-group-text">
-                      <i class="fas fa-user"></i>
-                    </span>
-                    <input
-                      type="text"
-                      class="form-control"
-                      id="buscaAutor"
-                      placeholder="Autor"
                     />
                   </div>
                 </div>
@@ -271,6 +249,21 @@
                   <i class="fas fa-info-circle me-1"></i>
                   Los documentos públicos son visibles para todos los usuarios
                   del sistema.
+                </div>
+              </div>
+              <div class="mb-4">
+                <label for="docArchivo" class="form-label">
+                  <i class="fas fa-paperclip me-2"></i>
+                  Archivo adjunto (Word o PDF)
+                </label>
+                <input
+                  type="file"
+                  class="form-control"
+                  id="docArchivo"
+                  accept=".pdf,.doc,.docx"
+                />
+                <div class="form-text">
+                  Opcional. Solo se permiten archivos PDF o Word.
                 </div>
               </div>
             </div>
@@ -367,6 +360,104 @@
               <button type="submit" class="btn btn-primary">
                 <i class="fas fa-paper-plane me-2"></i>
                 Enviar Invitación
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal Editar Documento -->
+    <div
+      class="modal fade"
+      id="editarDocModal"
+      tabindex="-1"
+      aria-labelledby="editarDocModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <form id="editarDocForm" novalidate>
+            <div class="modal-header">
+              <h5 class="modal-title" id="editarDocModalLabel">
+                <i class="fas fa-edit me-2"></i>
+                Editar Documento
+              </h5>
+              <button
+                type="button"
+                class="btn-close btn-close-white"
+                data-bs-dismiss="modal"
+                aria-label="Cerrar"
+              ></button>
+            </div>
+            <div class="modal-body">
+              <div class="mb-4">
+                <label for="editDocTitulo" class="form-label">
+                  <i class="fas fa-file-alt me-2"></i>
+                  Título del Documento
+                </label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="editDocTitulo"
+                  required
+                  maxlength="255"
+                  placeholder="Ingresa el título del documento"
+                />
+                <div class="invalid-feedback">
+                  <i class="fas fa-exclamation-triangle me-1"></i>
+                  El título es requerido (máximo 255 caracteres).
+                </div>
+              </div>
+              <div class="mb-4">
+                <label for="editDocPublico" class="form-label">
+                  <i class="fas fa-globe me-2"></i>
+                  Visibilidad del Documento
+                </label>
+                <select class="form-select" id="editDocPublico">
+                  <option value="false">
+                    <i class="fas fa-lock me-2"></i>
+                    Privado (solo tú)
+                  </option>
+                  <option value="true">
+                    <i class="fas fa-unlock me-2"></i>
+                    Público (visible para todos)
+                  </option>
+                </select>
+                <div class="form-text">
+                  <i class="fas fa-info-circle me-1"></i>
+                  Los documentos públicos son visibles para todos los usuarios
+                  del sistema.
+                </div>
+              </div>
+              <div class="mb-4">
+                <label for="editDocArchivo" class="form-label">
+                  <i class="fas fa-paperclip me-2"></i>
+                  Cambiar archivo adjunto (Word o PDF)
+                </label>
+                <input
+                  type="file"
+                  class="form-control"
+                  id="editDocArchivo"
+                  accept=".pdf,.doc,.docx"
+                />
+                <div class="form-text">
+                  Opcional. Solo se permiten archivos PDF o Word. Si no seleccionas uno nuevo, se mantiene el actual.
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button
+                type="button"
+                class="btn btn-secondary"
+                data-bs-dismiss="modal"
+              >
+                <i class="fas fa-times me-2"></i>
+                Cancelar
+              </button>
+              <button type="submit" class="btn btn-primary" id="editarDocGuardarBtn">
+                <i class="fas fa-save me-2"></i>
+                Guardar Cambios
               </button>
             </div>
           </form>

@@ -14,10 +14,6 @@ import java.util.stream.Collectors;
 import com.utplist.proyecto.observer.IReporteObserver;
 import org.springframework.beans.factory.annotation.Autowired;
 
-/**
- * Implementación del servicio para la gestión de reportes sobre documentos.
- * Permite crear, listar, aceptar y rechazar reportes, y notificar a los observadores.
- */
 @Service
 @RequiredArgsConstructor
 public class ReporteDocumentoServiceImpl implements IReporteDocumentoService {
@@ -27,11 +23,6 @@ public class ReporteDocumentoServiceImpl implements IReporteDocumentoService {
     @Autowired(required = false)
     private List<IReporteObserver> observers = new java.util.ArrayList<>();
 
-    /**
-     * Crea un nuevo reporte sobre un documento.
-     * @param dto Datos del reporte
-     * @return Reporte creado
-     */
     @Override
     public ReporteDocumentoDTO crearReporte(CrearReporteDocumentoDTO dto) {
         Document doc = documentRepository.findById(dto.getDocumentoId())
@@ -50,33 +41,18 @@ public class ReporteDocumentoServiceImpl implements IReporteDocumentoService {
         return toDTO(reporte);
     }
 
-    /**
-     * Lista los reportes pendientes de revisión.
-     * @return Lista de reportes pendientes
-     */
     @Override
     public List<ReporteDocumentoDTO> listarReportesPendientes() {
         return reporteRepository.findByEstado(ReporteDocumento.EstadoReporte.PENDIENTE)
                 .stream().map(this::toDTO).collect(Collectors.toList());
     }
 
-    /**
-     * Busca reportes por documento.
-     * @param documentoId ID del documento
-     * @return Lista de reportes encontrados
-     */
     @Override
     public List<ReporteDocumentoDTO> buscarReportesPorDocumento(Long documentoId) {
         return reporteRepository.findByDocumentoId(documentoId)
                 .stream().map(this::toDTO).collect(Collectors.toList());
     }
 
-    /**
-     * Acepta un reporte (solo para moderadores).
-     * @param reporteId ID del reporte
-     * @param moderadorId ID del moderador
-     * @param comentarioModerador Comentario opcional del moderador
-     */
     @Override
     public void aceptarReporte(Long reporteId, Long moderadorId, String comentarioModerador) {
         ReporteDocumento reporte = reporteRepository.findById(reporteId)
@@ -95,12 +71,6 @@ public class ReporteDocumentoServiceImpl implements IReporteDocumentoService {
         observers.forEach(obs -> obs.onDocumentoEliminadoPorReporte(reporte, moderadorId));
     }
 
-    /**
-     * Rechaza un reporte (solo para moderadores).
-     * @param reporteId ID del reporte
-     * @param moderadorId ID del moderador
-     * @param comentarioModerador Comentario opcional del moderador
-     */
     @Override
     public void rechazarReporte(Long reporteId, Long moderadorId, String comentarioModerador) {
         ReporteDocumento reporte = reporteRepository.findById(reporteId)

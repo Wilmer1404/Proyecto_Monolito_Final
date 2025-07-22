@@ -7,15 +7,8 @@ import io.swagger.v3.oas.models.info.License;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-/**
- * Configuración de OpenAPI/Swagger para la documentación interactiva de la API REST.
- */
 @Configuration
 public class OpenApiConfig {
-    /**
-     * Configura la instancia de OpenAPI con información del proyecto.
-     * @return Objeto OpenAPI configurado
-     */
     @Bean
     public OpenAPI customOpenAPI() {
         return new OpenAPI()

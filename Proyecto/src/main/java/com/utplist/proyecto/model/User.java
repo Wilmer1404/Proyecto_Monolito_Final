@@ -4,8 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 /**
- * Entidad que representa un usuario en el sistema.
- * Incluye información sobre el correo, contraseña y rol asignado.
+ * Representa un usuario en el sistema.
  */
 @Entity
 @Table(name = "users")
@@ -21,11 +20,11 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    /** Correo electrónico único del usuario */
+    /** Correo electrónico del usuario */
     @Column(unique = true, nullable = false)
     private String email;
 
-    /** Contraseña encriptada del usuario */
+    /** Contraseña encriptada */
     @Column(nullable = false)
     private String password;
 

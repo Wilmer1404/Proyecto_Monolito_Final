@@ -1,0 +1,38 @@
+.dashboard-container {
+  min-height: 100vh;
+  display: flex;
+  background: #f8f9fa;
+}
+.sidebar {
+  width: 260px;
+  min-height: 100vh;
+  border-right: 1px solid #e0e0e0;
+  background: #fff;
+}
+.sidebar-user-info {
+  background: #f1f3f4;
+  border-radius: 0 0 8px 8px;
+  text-align: center;
+}
+.nav-link {
+  color: #333;
+  font-weight: 500;
+  padding: 12px 20px;
+  border-radius: 6px;
+  margin-bottom: 4px;
+  transition: background 0.2s;
+}
+.nav-link.active, .nav-link:hover {
+  background: #e3e7fa;
+  color: #1a237e;
+}
+.badge.bg-primary { background: #1976d2 !important; }
+.badge.bg-purple { background: #7c4dff !important; }
+.badge.bg-warning { background: #ff9800 !important; color: #fff; }
+.badge.bg-success { background: #43a047 !important; }
+.badge.bg-secondary { background: #757575 !important; }
+@media (max-width: 900px) {
+  .sidebar { width: 100px; }
+  .sidebar-user-info { font-size: 0.9em; }
+  .nav-link { padding: 10px 8px; font-size: 0.95em; }
+} 

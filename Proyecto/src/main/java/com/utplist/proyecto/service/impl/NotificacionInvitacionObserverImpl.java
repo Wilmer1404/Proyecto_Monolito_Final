@@ -9,20 +9,12 @@ import org.springframework.context.annotation.Configuration;
 
 import java.time.LocalDateTime;
 
-/**
- * Implementación del observer para notificar a los usuarios cuando son invitados a un documento.
- * Crea y guarda una notificación en la base de datos.
- */
 @Configuration
 public class NotificacionInvitacionObserverImpl implements IInvitacionObserver {
 
     @Autowired
     private NotificacionRepository notificacionRepository;
 
-    /**
-     * Método que se ejecuta cuando un usuario es invitado a un documento.
-     * @param invitacion Invitación creada
-     */
     @Override
     public void onUsuarioInvitado(Invitacion invitacion) {
         String mensaje = String.format("Has sido invitado como %s al documento '%s'.",
