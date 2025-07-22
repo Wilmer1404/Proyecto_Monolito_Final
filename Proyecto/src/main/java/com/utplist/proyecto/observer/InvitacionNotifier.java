@@ -8,6 +8,9 @@ import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Clase que implementa el patrón Observer para notificar a los observadores cuando se crea una invitación.
+ */
 @Component
 public class InvitacionNotifier {
 
@@ -18,6 +21,10 @@ public class InvitacionNotifier {
         this.observers.addAll(observerList); // Spring inyecta todos los beans que implementan InvitacionObserver
     }
 
+    /**
+     * Notifica a todos los observadores registrados sobre una nueva invitación.
+     * @param invitacion Invitación creada
+     */
     public void notificarInvitacion(Invitacion invitacion) {
         observers.forEach(observer -> observer.onUsuarioInvitado(invitacion));
     }

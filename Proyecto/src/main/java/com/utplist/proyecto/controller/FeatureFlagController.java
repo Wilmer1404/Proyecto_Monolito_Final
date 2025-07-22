@@ -8,6 +8,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+/**
+ * Controlador REST para la gestión y consulta de feature flags (banderas de funcionalidad).
+ * Permite consultar y habilitar flags desde la API.
+ */
 @Tag(name = "Feature Flags", description = "Consulta de flags de características activas")
 @RestController
 @RequestMapping("/feature-flags")
@@ -15,6 +19,11 @@ import org.springframework.web.bind.annotation.*;
 public class FeatureFlagController {
     private final IFeatureFlagService featureFlagService;
 
+    /**
+     * Consulta si una feature flag está habilitada.
+     * @param nombre Nombre de la feature flag
+     * @return true si está habilitada, false si no
+     */
     @Operation(summary = "Consultar si una feature flag está habilitada")
     @GetMapping("/{nombre}")
     public ResponseEntity<Boolean> isEnabled(
@@ -23,6 +32,11 @@ public class FeatureFlagController {
         return ResponseEntity.ok(featureFlagService.isEnabled(nombre));
     }
 
+    /**
+     * Habilita una feature flag.
+     * @param nombre Nombre de la feature flag
+     * @return Mensaje de éxito
+     */
     @Operation(summary = "Habilitar una feature flag")
     @PostMapping("/{nombre}/habilitar")
     public ResponseEntity<String> habilitar(

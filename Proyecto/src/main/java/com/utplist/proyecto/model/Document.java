@@ -8,13 +8,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Documento colaborativo.
+ * Entidad que representa un documento colaborativo en el sistema.
+ * Incluye información sobre el autor, contenido, fechas, estado y relaciones con invitaciones.
  */
 @Entity
 @Table(name = "documentos")
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
 public class Document {
 
+    /** Identificador único del documento */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -38,22 +40,27 @@ public class Document {
     @JoinColumn(name = "autor_id", nullable = false)
     private User autor;
 
+    /** Fecha de creación del documento */
     @Column(name = "fecha_creacion")
     private LocalDateTime fechaCreacion;
 
+    /** Fecha de última actualización del documento */
     @Column(name = "fecha_actualizacion")
     private LocalDateTime fechaActualizacion;
 
+    /** Contenido del documento */
     private String contenido;
+    /** Categoría del documento (opcional, máximo 100 caracteres) */
     @Size(max = 100)
     private String categoria;
+    /** Indica si el documento es público */
     private Boolean publico;
 
-    /** Indica si se puede editar. */
+    /** Indica si se puede editar el documento */
     @Column(name = "editable")
     private Boolean editable = Boolean.TRUE;
 
-    /** Invitaciones asociadas. */
+    /** Invitaciones asociadas a este documento */
     @OneToMany(mappedBy = "documento", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Invitacion> invitados = new ArrayList<>();
 }
